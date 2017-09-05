@@ -1,9 +1,5 @@
 <template>
-  <q-layout
-    ref="layout"
-    view="lHh Lpr fff"
-    :left-class="{'bg-grey-2': true}"
-  >
+  <main>
     <q-toolbar slot="header" class="glossy">
       <q-toolbar-title>
         QwestApp
@@ -12,7 +8,7 @@
     </q-toolbar>
 
     <investigation></investigation>
-  </q-layout>
+  </main>
 </template>
 
 <script>

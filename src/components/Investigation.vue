@@ -1,47 +1,97 @@
 <template>
-  <div>
-    <ul class="list-heroes">
-      <li v-for="question in questions" v-if="currentStep == question.step">
-        <div>{{question.number}}</div>
-        <div>{{question.question}}</div>
-        <div v-for="answer in question.answers">
-          <div>
-            <input type="radio" :name="answer.name" :value="answer.label" @click="check($event)">{{answer.label}}
-          </div>
-        </div>
-        <p v-if="answered == true">You answered correctly to this question! Congratulation man.</p>
-      </li>
-      <button v-if="currentStep <= 2" :disabled="currentStep == 0" @click="prevStep" class="q-btn row inline flex-center q-focusable q-hoverable relative-position q-btn-rectangle q-btn-standard text-black">
-        <span class="q-btn-inner row col flex-center">Previous step</span>
-      </button>
-      <button v-if="answered && currentStep <= 2" @click="nextStep" class="q-btn row inline flex-center q-focusable q-hoverable relative-position q-btn-rectangle q-btn-standard bg-primary text-white">
-        <span class="q-btn-inner row col flex-center">Next step</span>
-      </button>
-      <button v-if="currentStep == 2" @click="seeResult" class="q-btn row inline flex-center q-focusable q-hoverable relative-position q-btn-rectangle q-btn-standard bg-primary text-white">
-        <span class="q-btn-inner row col flex-center">See your result!</span>
-      </button>
-    </ul>
-    <div v-if="currentStep == 3">
-      {{gender}} / {{hero}}
+  <section>
+    <div v-if="!result && currentStep > 0" class="steps">
+      Step {{currentStep}}
+      <q-progress :percentage="(currentStep / numberOfSteps) * 100" color="secondary" />
     </div>
-  </div>
+    <div v-if="currentStep == 0">
+      <p>
+        There is only one answer possible for each questions.<br/>
+        Once you validated a step you cannot change answers in previous steps.
+        <br/>
+        <br/>
+        At the end of the investigation you will be able de see your personal result.
+      </p>
+      <br/>
+      <br/>
+      <q-btn @click="currentStep = 1" color="primary">
+        Let's start!
+      </q-btn>
+    </div>
+    <div v-if="currentStep > 0 && currentStep <= numberOfSteps && !result">
+      <ul class="list-heroes">
+        <li v-for="question in questions" v-if="currentStep == question.step">
+          <div>{{question.number}}</div>
+          <div>{{question.question}}</div>
+          <div v-for="answer in question.answers">
+            <div>
+              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event)">{{answer.label}}
+            </div>
+          </div>
+        </li>
+      </ul>
+      <q-btn v-if="currentStep < numberOfSteps" @click="nextStep" color="primary">
+        Next step
+      </q-btn>
+      <q-btn v-if="currentStep == numberOfSteps && !result" @click="seeResult" icon-right="check" color="primary" big>
+        See your result!
+      </q-btn>
+    </div>
+    <div v-if="result">
+        Gender: {{gender}} / Hero: {{hero}} / Age: {{age}} / Color: {{color}}
+        <br/>
+        <br/>
+        <q-btn v-if="result" @click="restart" color="primary">
+          Restart
+        </q-btn>
+    </div>
+  </section>
 </template>
 
 <script>
+import {
+  QLayout,
+  QToolbar,
+  QToolbarTitle,
+  QBtn,
+  QIcon,
+  QList,
+  QListHeader,
+  QItem,
+  QItemSide,
+  QItemMain,
+  QProgress
+} from 'quasar'
+
 export default {
-  name: 'investigation',
+  components: {
+    QLayout,
+    QToolbar,
+    QToolbarTitle,
+    QBtn,
+    QIcon,
+    QList,
+    QListHeader,
+    QItem,
+    QItemSide,
+    QItemMain,
+    QProgress
+  },
   data () {
     return {
+      result: false,
       currentStep: 0,
-      answered: false,
+      numberOfSteps: 3,
+      hasDescription: false,
       value: '',
       label: '',
       gender: '',
       hero: '',
+      age: '',
       questions: [
         {
           number: '1',
-          step: 0,
+          step: 1,
           question: 'Are you a boy or a girl?',
           answers: [
             {
@@ -53,7 +103,7 @@ export default {
               name: 'gender'
             },
             {
-              label: 'Don\'t know yet!',
+              label: 'Other',
               name: 'gender'
             }
           ]
@@ -61,14 +111,14 @@ export default {
         {
           number: '2',
           step: 1,
-          question: 'Are you a hero ?',
+          question: 'Are you a hero?',
           answers: [
             {
               label: 'Not at all',
               name: 'hero'
             },
             {
-              label: 'A bit',
+              label: 'Sometime',
               name: 'hero'
             },
             {
@@ -80,6 +130,52 @@ export default {
               name: 'hero'
             }
           ]
+        },
+        {
+          number: '3',
+          step: 2,
+          question: 'How old are you?',
+          answers: [
+            {
+              label: 'Less than 20',
+              name: 'age'
+            },
+            {
+              label: 'Between 20 & 40',
+              name: 'age'
+            },
+            {
+              label: 'Between 40 & 60',
+              name: 'age'
+            },
+            {
+              label: 'More than 60',
+              name: 'age'
+            }
+          ]
+        },
+        {
+          number: '4',
+          step: 3,
+          question: 'What is your favorite color?',
+          answers: [
+            {
+              label: 'Red',
+              name: 'color'
+            },
+            {
+              label: 'Blue',
+              name: 'color'
+            },
+            {
+              label: 'Green',
+              name: 'color'
+            },
+            {
+              label: 'Yellow',
+              name: 'color'
+            }
+          ]
         }
       ]
     }
@@ -87,28 +183,36 @@ export default {
   methods: {
     nextStep: function () {
       this.currentStep++
-      this.answered = false
-      sessionStorage.setItem(this.label, this.value)
-    },
-    prevStep: function () {
-      this.currentStep--
-      sessionStorage.clear()
     },
     check: function (e) {
       if (e.target.checked) {
-        this.answered = true
         this.label = e.target.name
         this.value = e.target.value
+        sessionStorage.setItem(this.label, this.value)
       }
     },
     seeResult: function () {
-      this.currentStep = 3
+      this.result = true
       this.gender = sessionStorage.gender
       this.hero = sessionStorage.hero
+      this.age = sessionStorage.age
+      this.color = sessionStorage.color
+    },
+    restart: function () {
+      this.result = false
+      sessionStorage.clear()
+      this.currentStep = 0
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
+  li {
+    text-align: left;
+  }
+
+  .steps {
+    width: 200px;
+  }
 </style>
