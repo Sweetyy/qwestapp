@@ -18,7 +18,14 @@ export default {}
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
     margin: 20px;
+  }
+
+  .align-center {
+    text-align: center;
+  }
+
+  .align-left {
+    text-align: left;
   }
 </style>

@@ -1,46 +1,65 @@
 <template>
   <section>
-    <div v-if="!result && currentStep > 0" class="steps">
-      Step {{currentStep}}
+    <!-- Explanation's message for the investigation -->
+    <q-card v-if="currentStep == 0">
+      <q-card-title class="align-center">
+        Are you a hero?
+      </q-card-title>
+      <q-card-main class="align-center">
+        <p>There is only one answer possible for each questions.<br/>
+        Once you validated a step you cannot change answers in previous steps.</p>
+        <br/>
+        <br/>
+        <p class="text-faded">At the end of the investigation you will be able to see your personal result.</p>
+      </q-card-main>
+      <q-card-separator />
+      <q-card-actions class="align-center">
+        <!-- Run the investigation -->
+        <q-btn @click="currentStep = 1" color="primary" big class="full-width">
+          Let's start!
+        </q-btn>
+      </q-card-actions>
+    </q-card>
+
+    <!-- Show the current step of the investigation -->
+    <div v-if="!result && currentStep > 0" class="steps align-center non-selectable">
+      Step {{currentStep}}/{{numberOfSteps}}
       <q-progress :percentage="(currentStep / numberOfSteps) * 100" color="secondary" />
     </div>
-    <div v-if="currentStep == 0">
-      <p>
-        There is only one answer possible for each questions.<br/>
-        Once you validated a step you cannot change answers in previous steps.
-        <br/>
-        <br/>
-        At the end of the investigation you will be able de see your personal result.
-      </p>
-      <br/>
-      <br/>
-      <q-btn @click="currentStep = 1" color="primary">
-        Let's start!
-      </q-btn>
-    </div>
-    <div v-if="currentStep > 0 && currentStep <= numberOfSteps && !result">
-      <ul class="list-heroes">
-        <li v-for="question in questions" v-if="currentStep == question.step">
-          <div>{{question.number}}</div>
-          <div>{{question.question}}</div>
-          <div v-for="answer in question.answers">
+
+    <!-- Main content of the investigation that contains the questions -->
+    <div v-if="currentStep > 0 && currentStep <= numberOfSteps && !result" style="max-width: 480px; width: 100%">
+      <q-card v-for="question in questions" v-bind:key="question.data" v-if="currentStep == question.step">
+        <q-card-title>
+          {{question.number}}. {{question.question}}
+        </q-card-title>
+        <q-card-main>
+          <div v-for="answer in question.answers" v-bind:key="answer.data" >
             <div>
-              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event, answer)" :checked="answer.checked">{{answer.label}}
+              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event, answer,question.answers)" :checked="answer.checked">{{answer.label}}
             </div>
           </div>
-        </li>
-      </ul>
-      <q-btn :disabled="disableNext()" v-if="currentStep < numberOfSteps" @click="nextStep" color="primary">
-        Next step
-      </q-btn>
-      <q-btn v-if="currentStep == numberOfSteps && !result" @click="seeResult" icon-right="check" color="primary" big>
-        See your result!
-      </q-btn>
+        </q-card-main>
+      </q-card>
+      <div class="align-center">
+        <!-- Go to the next step only if the user answered to all the questions -->
+        <q-btn :disabled="disableNext()" v-if="currentStep < numberOfSteps" @click="nextStep" color="primary" standard>
+          Next step
+        </q-btn>
+        <!-- See the results after all the steps / Only displayed in the last step -->
+        <q-btn :disabled="disableNext()" v-if="currentStep == numberOfSteps && !result" @click="seeResult" icon-right="check" color="primary" big>
+          See your result!
+        </q-btn>
+      </div>
     </div>
-    <div v-if="result">
+
+    <!-- The result -->
+    <div v-if="result" class="align-center">
         Gender: {{gender}} / Hero: {{hero}} / Age: {{age}} / Color: {{color}}
         <br/>
         <br/>
+
+        <!-- Restart the investigation -->
         <q-btn v-if="result" @click="restart" color="primary">
           Restart
         </q-btn>
@@ -60,7 +79,14 @@ import {
   QItem,
   QItemSide,
   QItemMain,
-  QProgress
+  QProgress,
+  QCardTitle,
+  QCard,
+  QCardMain,
+  QCardActions,
+  QCardSeparator,
+  QRadio,
+  Toast
 } from 'quasar'
 
 export default {
@@ -75,10 +101,19 @@ export default {
     QItem,
     QItemSide,
     QItemMain,
-    QProgress
+    QProgress,
+    QCardTitle,
+    QCardMain,
+    QCard,
+    QCardActions,
+    QCardSeparator,
+    QRadio,
+    Toast
   },
+  
   data () {
     return {
+      option: '',
       result: false,
       currentStep: 0,
       numberOfSteps: 3,
@@ -199,8 +234,12 @@ export default {
     nextStep: function () {
       this.currentStep++
     },
-    check: function (e, a) {
+    check: function (e, a, answers) {
       if (e.target.checked) {
+        for (var i = 0; i < answers.length; i++) {
+          var ans = answers[i]
+          ans.checked = false
+        }
         a.checked = true
         this.label = e.target.name
         this.value = e.target.value
