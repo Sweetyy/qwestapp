@@ -28,4 +28,25 @@ export default {}
   .align-left {
     text-align: left;
   }
+
+  .flexbox {
+    display: flex;
+    align-items: center;
+  }
+
+  .flexstart {
+    align-items: flex-start;
+  }
+
+  .flexend {
+    align-items: flex-end;
+  }
+
+  .flexcenter {
+    justify-content: center;
+  }
+
+  .flexspacearound {
+    justify-content: space-around;
+  }
 </style>

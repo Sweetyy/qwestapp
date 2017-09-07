@@ -33,12 +33,12 @@
         <q-card-title>
           {{question.number}}. {{question.question}}
         </q-card-title>
-        <q-card-main>
-          <div v-for="answer in question.answers" v-bind:key="answer.data" >
-            <div>
-              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event, answer,question.answers)" :checked="answer.checked">{{answer.label}}
-            </div>
-          </div>
+        <q-card-main class="answer-content flexbox flexstart flexspacearound">
+            <label v-for="answer in question.answers" v-bind:key="answer.data" v-bind:class="answer.checked ? 'checked' : ''" class="flexbox flexcenter check-custom">
+              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event, answer,question.answers)" :checked="answer.checked">
+              <div></div>
+              <span>{{answer.label}}</span>
+            </label>
         </q-card-main>
       </q-card>
       <div class="align-center">
@@ -110,7 +110,7 @@ export default {
     QRadio,
     Toast
   },
-  
+
   data () {
     return {
       option: '',
@@ -310,4 +310,78 @@ export default {
   .steps {
     width: 200px;
   }
+
+  .check-custom {
+    position: relative;
+    flex-direction: column;
+    cursor: pointer;
+    margin: 4px;
+    width: 60px;
+  }
+
+  .check-custom input {
+    display: none;
+  }
+
+  .check-custom span {
+    position: relative;
+    text-align: center;
+    font-size: 0.9em;
+    transition: all 0.25s;
+  }
+
+  .check-custom.checked span {
+    color: #26a69a;
+  }
+
+  .check-custom div {
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: white;
+    border: solid 2px #26a69a;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 8px;
+  }
+
+  .check-custom div:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    background: #26a69a;
+    display: block;
+    transition: all 0.25s;
+  }
+
+  .check-custom.checked div:after {
+    width: 26px;
+    height: 26px;
+    left: -1px;
+    top: -1px;
+  }
+
+  @media screen and (max-width: 500px) {
+      .answer-content {
+        display: block;
+      }
+
+      .check-custom {
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        width: auto;
+      }
+
+      .check-custom div {
+        margin: 0;
+        margin-right: 8px;
+      }
+  }
+
 </style>
