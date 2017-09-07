@@ -218,21 +218,46 @@ export default {
       this.result = false
       sessionStorage.clear()
       this.currentStep = 0
+      this.initData()
     },
     disableNext: function () {
-      var data = data();
-      var questions = data.questions
-      for(var i=0;i<questions.length;i++){
-        var question = questions[i];
-        if(question.step === currentStep){
-          for(var j=0;j<question.answers.length;j++){
-            var answer = question.answers[j];
-            if(answer.checked)
-              return true ;
+      var cpt = 0
+      for (var i = 0; i < this.questions.length; i++) {
+        var question = this.questions[i]
+        if (question.step === this.currentStep) {
+          for (var j = 0; j < question.answers.length; j++) {
+            var answer = question.answers[j]
+            if (answer.checked) {
+              cpt++
+            }
           }
         }
       }
-      return false ;
+      if (cpt === this.getCountQ()) {
+        return false
+      }
+      return true
+    },
+    getCountQ: function () {
+      var cpt = 0
+      for (var i = 0; i < this.questions.length; i++) {
+        var question = this.questions[i]
+        if (question.step === this.currentStep) {
+          cpt++
+        }
+      }
+      return cpt
+    },
+    initData: function () {
+      for (var i = 0; i < this.questions.length; i++) {
+        var question = this.questions[i]
+        for (var j = 0; j < question.answers.length; j++) {
+          var answer = question.answers[j]
+          if (answer.checked) {
+            answer.checked = false
+          }
+        }
+      }
     }
   }
 }
