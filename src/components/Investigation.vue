@@ -25,12 +25,12 @@
           <div>{{question.question}}</div>
           <div v-for="answer in question.answers">
             <div>
-              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event)">{{answer.label}}
+              <input type="radio" :name="answer.name" :value="answer.label" @click="check($event, answer)" :checked="answer.checked">{{answer.label}}
             </div>
           </div>
         </li>
       </ul>
-      <q-btn v-if="currentStep < numberOfSteps" @click="nextStep" color="primary">
+      <q-btn :disabled="disableNext()" v-if="currentStep < numberOfSteps" @click="nextStep" color="primary">
         Next step
       </q-btn>
       <q-btn v-if="currentStep == numberOfSteps && !result" @click="seeResult" icon-right="check" color="primary" big>
@@ -82,7 +82,7 @@ export default {
       result: false,
       currentStep: 0,
       numberOfSteps: 3,
-      hasDescription: false,
+      answered: false,
       value: '',
       label: '',
       gender: '',
@@ -96,15 +96,18 @@ export default {
           answers: [
             {
               label: 'Boy',
-              name: 'gender'
+              name: 'gender',
+              checked: false
             },
             {
               label: 'Girl',
-              name: 'gender'
+              name: 'gender',
+              checked: false
             },
             {
               label: 'Other',
-              name: 'gender'
+              name: 'gender',
+              checked: false
             }
           ]
         },
@@ -115,19 +118,23 @@ export default {
           answers: [
             {
               label: 'Not at all',
-              name: 'hero'
+              name: 'hero',
+              checked: false
             },
             {
               label: 'Sometime',
-              name: 'hero'
+              name: 'hero',
+              checked: false
             },
             {
               label: 'Often',
-              name: 'hero'
+              name: 'hero',
+              checked: false
             },
             {
               label: 'I am born to be a hero!',
-              name: 'hero'
+              name: 'hero',
+              checked: false
             }
           ]
         },
@@ -138,19 +145,23 @@ export default {
           answers: [
             {
               label: 'Less than 20',
-              name: 'age'
+              name: 'age',
+              checked: false
             },
             {
               label: 'Between 20 & 40',
-              name: 'age'
+              name: 'age',
+              checked: false
             },
             {
               label: 'Between 40 & 60',
-              name: 'age'
+              name: 'age',
+              checked: false
             },
             {
               label: 'More than 60',
-              name: 'age'
+              name: 'age',
+              checked: false
             }
           ]
         },
@@ -161,19 +172,23 @@ export default {
           answers: [
             {
               label: 'Red',
-              name: 'color'
+              name: 'color',
+              checked: false
             },
             {
               label: 'Blue',
-              name: 'color'
+              name: 'color',
+              checked: false
             },
             {
               label: 'Green',
-              name: 'color'
+              name: 'color',
+              checked: false
             },
             {
               label: 'Yellow',
-              name: 'color'
+              name: 'color',
+              checked: false
             }
           ]
         }
@@ -184,8 +199,9 @@ export default {
     nextStep: function () {
       this.currentStep++
     },
-    check: function (e) {
+    check: function (e, a) {
       if (e.target.checked) {
+        a.checked = true
         this.label = e.target.name
         this.value = e.target.value
         sessionStorage.setItem(this.label, this.value)
@@ -202,6 +218,21 @@ export default {
       this.result = false
       sessionStorage.clear()
       this.currentStep = 0
+    },
+    disableNext: function () {
+      var data = data();
+      var questions = data.questions
+      for(var i=0;i<questions.length;i++){
+        var question = questions[i];
+        if(question.step === currentStep){
+          for(var j=0;j<question.answers.length;j++){
+            var answer = question.answers[j];
+            if(answer.checked)
+              return true ;
+          }
+        }
+      }
+      return false ;
     }
   }
 }
