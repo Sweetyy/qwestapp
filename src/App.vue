@@ -13,12 +13,17 @@ export default {}
 </script>
 
 <style>
-  section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: 20px;
+  .layout-page {
+    min-height: auto !important;
+  }
+  
+  .main-content {
+    max-width: 800px;
+    margin: 40px auto;
+  }
+
+  h4 {
+    margin-bottom: 40px;
   }
 
   .align-center {
