@@ -402,7 +402,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   li {
     text-align: left;
   }
@@ -437,8 +437,8 @@ export default {
 
   .check-custom div {
     position: relative;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: white;
     border: solid 2px #26a69a;
@@ -457,14 +457,17 @@ export default {
     border-radius: 50%;
     background: #26a69a;
     display: block;
-    transition: all 0.25s;
+    transition: all 0.4s;
+    transition-timing-function: cubic-bezier(.17,.86,.41,1.8);
+    opacity: 0;
   }
 
   .check-custom.checked div:after {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     left: -1px;
     top: -1px;
+    opacity: 1;
   }
 
   @media screen and (max-width: 500px) {
