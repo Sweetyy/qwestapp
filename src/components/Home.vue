@@ -7,6 +7,7 @@
       </q-btn>
       <q-toolbar-title>
         HeroApp
+        <test v-bind:browser="browser"></test>
         <span slot="subtitle">Searching for heroes</span>
       </q-toolbar-title>
     </q-toolbar>
@@ -87,7 +88,7 @@ import {
   QSideLink
 } from 'quasar'
 
-//  import Investigation from './Investigation.vue'
+import Test from './Test.vue'
 
 export default {
   name: 'index',
@@ -109,11 +110,13 @@ export default {
     QCardActions,
     QCardSeparator,
     QRadio,
-    QSideLink
-    //  'investigation': Investigation
+    QSideLink,
+    'test': Test
   },
   data () {
-    return {}
+    return {
+      browser: 'Chrome'
+    }
   },
   computed: {},
   methods: {}
